@@ -30,10 +30,10 @@ class Encoder(nn.Module):
         # print(inputs.shape)
         batch_size = inputs.size()[0]
         state_shape = self.config.n_cells, batch_size, self.config.d_hidden
-        h0 = c0 = inputs.new_zeros(state_shape)
-        outputs, (ht, ct) = self.rnn(inputs, (h0, c0))
-
-        return ht[-1] if not self.config.birnn else ht[-2:].transpose(0, 1).contiguous().view(batch_size, -1)
+        # h0 = c0 = inputs.new_zeros(state_shape)
+        outputs, (ht, ct) = self.rnn(inputs)
+        return outputs[:, -1]
+        # return ht[-1] if not self.config.birnn else ht[-2:].transpose(0, 1).contiguous().view(batch_size, -1)
 
 class SNLIClassifier(nn.Module):
 
@@ -53,13 +53,13 @@ class SNLIClassifier(nn.Module):
             nn.Linear(*lin_config),
             self.relu,
             self.dropout,
-            nn.Linear(*lin_config),
+            nn.Linear(1200, 512),
             self.relu,
             self.dropout,
-            nn.Linear(*lin_config),
+            nn.Linear(512, 256),
             self.relu,
             self.dropout,
-            nn.Linear(seq_in_size, config.d_out))
+            nn.Linear(256, config.d_out))
 
     def forward(self, batch):
 
@@ -77,3 +77,4 @@ class SNLIClassifier(nn.Module):
 
         scores = self.out(torch.cat([premise, hypothesis], 1))
         return scores
+

@@ -15,7 +15,7 @@ from src.config import get_args, makedirs
 args = get_args()
 # torch.cuda.set_device(args.gpu)
 device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() else 'cpu')
-
+print(device)
 TEXT = data.Field(lower=args.lower, batch_first=True)
 LABEL = data.LabelField()
 
